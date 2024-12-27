@@ -16,7 +16,7 @@ class TaskDb {
     return _database!;
   }
 
-  // Initialize database
+ 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'tasks.db');
     return openDatabase(path, onCreate: (db, version) {
@@ -26,13 +26,13 @@ class TaskDb {
     }, version: 1);
   }
 
-  // Insert a new task
+
   Future<void> insertTask(Task task) async {
     final db = await database;
     await db.insert('tasks', task.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  // Get all tasks
+  
   Future<List<Task>> getTasks() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('tasks');
@@ -41,7 +41,7 @@ class TaskDb {
     });
   }
 
-  // Update task completion status
+
   Future<void> updateTaskCompletion(int id, bool isCompleted) async {
     final db = await database;
     await db.update(
