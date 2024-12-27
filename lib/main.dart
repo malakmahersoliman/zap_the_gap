@@ -1,51 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:zap_the_gap/ui/home_page.dart';
+import 'package:zap_the_gap/ui/theme.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // Variable to keep track of the theme mode
+  bool _isDarkMode = false;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Zap the Gap',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        appBarTheme: AppBarTheme(
-          color: Colors.blue,
-          iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.black, fontSize: 16),
-          bodyMedium: TextStyle(color: Colors.black54, fontSize: 14),
-        ),
+      theme: CustomTheme.lightTheme,
+      darkTheme: CustomTheme.darkTheme, 
+      themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light, 
+      home: HomePage(
+        toggleTheme: () {
+          setState(() {
+            _isDarkMode = !_isDarkMode; 
+          });
+        },
       ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.blueGrey,
-        appBarTheme: AppBarTheme(
-          color: Colors.blueGrey,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.white, fontSize: 16),
-          bodyMedium: TextStyle(color: Colors.white70, fontSize: 14),
-        ),
-      ),
-      home: const HomePage(),
     );
   }
 }
