@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:zap_the_gap/model/task.dart';
+import 'package:zap_the_gap/ui/task_details_page.dart';
 import 'create_task_page.dart'; 
-import 'package:zap_the_gap/db/task_db.dart'; // Use TaskDb here
+import 'package:zap_the_gap/db/task_db.dart'; 
 
 class HomePage extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -17,9 +18,9 @@ class _HomePageState extends State<HomePage> {
   CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  List<Task> _tasks = []; // Store tasks from the database
+  List<Task> _tasks = []; 
 
-  int _selectedIndex = 0; // Track the selected tab index
+  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -27,11 +28,10 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Fetch tasks from the database
+
   void _fetchTasks([DateTime? date]) async {
     final tasks = await TaskDb().getTasks(); // Use TaskDb to fetch tasks
 
-    // If a date is selected, filter tasks by dueDate
     final filteredTasks = tasks.where((task) {
       return date == null || isSameDay(task.dueDate, date);
     }).toList();
@@ -122,19 +122,19 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 20),
           // Display tasks
           Expanded(
-child: _tasks.isEmpty
+  child: _tasks.isEmpty
       ? Center(child: Text('No tasks for this day', style: TextStyle(fontSize: 18, color: Colors.grey)))
       : ListView.builder(
           itemCount: _tasks.length,
           itemBuilder: (context, index) {
             final task = _tasks[index];
             return Dismissible(
-              key: Key(task.id.toString()), // Key for the dismissible widget
+              key: Key(task.id.toString()), 
               onDismissed: (direction) {
-                // Optionally delete the task after swipe
+                
                 TaskDb().deleteTask(task.id!);
                 setState(() {
-                  _tasks.removeAt(index); // Update task list after deletion
+                  _tasks.removeAt(index); 
                 });
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Task deleted')));
               },
@@ -144,7 +144,7 @@ child: _tasks.isEmpty
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Icon(Icons.delete, color: Colors.white),
               ),
-              direction: DismissDirection.endToStart, // Swipe from right to left to delete
+              direction: DismissDirection.endToStart, 
               child: ListTile(
                 title: Text(task.title),
                 subtitle: Text(task.description),
@@ -160,7 +160,13 @@ child: _tasks.isEmpty
                   },
                 ),
                 onTap: () {
-                  // Navigate to a detailed view of the task (if needed)
+                 
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TaskDetailsPage(task: task),
+                    ),
+                  );
                 },
               ),
             );
