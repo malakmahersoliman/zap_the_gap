@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:zap_the_gap/model/task.dart';
 import 'package:zap_the_gap/ui/task_details_page.dart';
-import 'create_task_page.dart'; 
-import 'package:zap_the_gap/db/task_db.dart'; 
+import 'create_task_page.dart';
+import 'package:zap_the_gap/db/task_db.dart';
+import 'package:zap_the_gap/ui/motivation_page.dart';
+import 'package:zap_the_gap/ui/study_method_selection_page.dart';
+import 'theme.dart';
 
 class HomePage extends StatefulWidget {
   final VoidCallback toggleTheme;
@@ -18,20 +21,28 @@ class _HomePageState extends State<HomePage> {
   CalendarFormat _calendarFormat = CalendarFormat.week;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  List<Task> _tasks = []; 
-
+  List<Task> _tasks = [];
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MotivationPage()),
+      );
+    } else if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const StudyMethodSelectionPage()),
+      );
+    }
   }
 
-
   void _fetchTasks([DateTime? date]) async {
-    final tasks = await TaskDb().getTasks(); // Use TaskDb to fetch tasks
-
+    final tasks = await TaskDb().getTasks();
     final filteredTasks = tasks.where((task) {
       return date == null || isSameDay(task.dueDate, date);
     }).toList();
@@ -42,10 +53,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _toggleTaskCompletion(int taskId, bool isCompleted) async {
-    await TaskDb().updateTaskCompletion(taskId, !isCompleted); 
-    _fetchTasks(); 
+    await TaskDb().updateTaskCompletion(taskId, !isCompleted);
+    _fetchTasks();
   }
-
 
   void _navigateToCreateTask() {
     Navigator.push(
@@ -53,17 +63,19 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(
         builder: (context) => CreateTaskPage(),
       ),
-    ).then((_) => _fetchTasks()); 
+    ).then((_) => _fetchTasks());
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchTasks(); 
+    _fetchTasks();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Center(
@@ -78,11 +90,11 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(
-              Theme.of(context).brightness == Brightness.dark
+              theme.brightness == Brightness.dark
                   ? Icons.light_mode
                   : Icons.dark_mode,
             ),
-            onPressed: widget.toggleTheme, // Toggle theme when pressed
+            onPressed: widget.toggleTheme,
           ),
         ],
       ),
@@ -104,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                       _selectedDay = selectedDay;
                       _focusedDay = focusedDay;
                     });
-                    _fetchTasks(selectedDay); // Fetch tasks for the selected day
+                    _fetchTasks(selectedDay);
                   },
                   calendarFormat: _calendarFormat,
                   onFormatChanged: (format) {
@@ -120,61 +132,65 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           SizedBox(height: 20),
-          // Display tasks
           Expanded(
-  child: _tasks.isEmpty
-      ? Center(child: Text('No tasks for this day', style: TextStyle(fontSize: 18, color: Colors.grey)))
-      : ListView.builder(
-          itemCount: _tasks.length,
-          itemBuilder: (context, index) {
-            final task = _tasks[index];
-            return Dismissible(
-              key: Key(task.id.toString()), 
-              onDismissed: (direction) {
-                
-                TaskDb().deleteTask(task.id!);
-                setState(() {
-                  _tasks.removeAt(index); 
-                });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Task deleted')));
-              },
-              background: Container(
-                color: Colors.red,
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Icon(Icons.delete, color: Colors.white),
-              ),
-              direction: DismissDirection.endToStart, 
-              child: ListTile(
-                title: Text(task.title),
-                subtitle: Text(task.description),
-                trailing: IconButton(
-                  icon: Icon(
-                    task.isCompleted
-                        ? Icons.check_circle
-                        : Icons.radio_button_unchecked,
-                    color: task.isCompleted ? Colors.green : Colors.grey,
-                  ),
-                  onPressed: () {
-                    _toggleTaskCompletion(task.id!, task.isCompleted);
-                  },
-                ),
-                onTap: () {
-                 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TaskDetailsPage(task: task),
+            child: _tasks.isEmpty
+                ? Center(
+                    child: Text(
+                      'No tasks for today go sleep 🛌✨',
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
                     ),
-                  );
-                },
-              ),
-            );
-          },
-        ),
+                  )
+                : ListView.builder(
+                    itemCount: _tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = _tasks[index];
+                      return Dismissible(
+                        key: Key(task.id.toString()),
+                        onDismissed: (direction) {
+                          TaskDb().deleteTask(task.id!);
+                          setState(() {
+                            _tasks.removeAt(index);
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Task deleted')),
+                          );
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
+                        direction: DismissDirection.endToStart,
+                        child: ListTile(
+                          title: Text(task.title),
+                          subtitle: Text(task.description),
+                          trailing: IconButton(
+                            icon: Icon(
+                              task.isCompleted
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              color: task.isCompleted ? Colors.green : Colors.grey,
+                            ),
+                            onPressed: () {
+                              _toggleTaskCompletion(task.id!, task.isCompleted);
+                            },
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TaskDetailsPage(task: task),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
-      ),     
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -188,10 +204,17 @@ class _HomePageState extends State<HomePage> {
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.auto_awesome_rounded),
+            label: 'Motivation',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer),
+            label: 'Timer',
           ),
         ],
+        backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+        selectedItemColor: theme.bottomNavigationBarTheme.selectedItemColor,
+        unselectedItemColor: theme.bottomNavigationBarTheme.unselectedItemColor,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToCreateTask,
@@ -201,4 +224,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
