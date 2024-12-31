@@ -25,15 +25,16 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Zap the Gap',
       debugShowCheckedModeBanner: false,
-      theme: CustomTheme.lightTheme, // Define your light theme in `CustomTheme`
-      darkTheme: CustomTheme.darkTheme, // Define your dark theme in `CustomTheme`
-      themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light, // Switch theme
-      home: LoginScreen(toggleTheme: () {  },),
+      theme: CustomTheme.lightTheme, 
+      darkTheme: CustomTheme.darkTheme, 
+      themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light, 
+      home: LoginScreen(toggleTheme: toggleTheme), 
     );
   }
 }
+

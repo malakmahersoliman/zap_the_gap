@@ -36,7 +36,8 @@ class _HomePageState extends State<HomePage> {
     } else if (index == 3) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const StudyMethodSelectionPage()),
+        MaterialPageRoute(
+            builder: (context) => const StudyMethodSelectionPage()),
       );
     }
   }
@@ -94,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                   ? Icons.light_mode
                   : Icons.dark_mode,
             ),
-            onPressed: widget.toggleTheme,
+            onPressed: widget.toggleTheme, // This will toggle the theme
           ),
         ],
       ),
@@ -170,7 +171,8 @@ class _HomePageState extends State<HomePage> {
                               task.isCompleted
                                   ? Icons.check_circle
                                   : Icons.radio_button_unchecked,
-                              color: task.isCompleted ? Colors.green : Colors.grey,
+                              color:
+                                  task.isCompleted ? Colors.green : Colors.grey,
                             ),
                             onPressed: () {
                               _toggleTaskCompletion(task.id!, task.isCompleted);
@@ -180,7 +182,8 @@ class _HomePageState extends State<HomePage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => TaskDetailsPage(task: task),
+                                builder: (context) =>
+                                    TaskDetailsPage(task: task),
                               ),
                             );
                           },
